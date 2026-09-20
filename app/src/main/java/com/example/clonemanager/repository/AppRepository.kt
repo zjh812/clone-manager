@@ -9,6 +9,18 @@ import com.example.clonemanager.data.AppInfo
 import com.example.clonemanager.root.ShellExecutor
 import com.example.clonemanager.root.ShellResult
 
+/**
+ * 分身内应用管理仓库。
+ *
+ * 分层：Activity → AppRepository → RootService(su) → pm / am
+ *
+ * TB321FU 已确认命令：
+ * - pm list packages --user <USER_ID>
+ * - pm install-existing --user <USER_ID> <PACKAGE>
+ * - pm uninstall --user <USER_ID> <PACKAGE>
+ * - pm clear --user <USER_ID> <PACKAGE>
+ * - am start --user <USER_ID> <COMPONENT>
+ */
 class AppRepository(
     private val context: Context,
     private val shell: ShellExecutor
@@ -30,6 +42,7 @@ class AppRepository(
         return parsePackageLines(res.stdout)
     }
 
+    /** 用 PackageManager 把包名丰富成 AppInfo（label / version / 是否系统应用） */
     private fun enrich(packageName: String, installed: Boolean): AppInfo {
         return try {
             val info = pm.getPackageInfo(packageName, 0)
@@ -41,25 +54,38 @@ class AppRepository(
                 versionName = info.versionName,
                 versionCode = if (android.os.Build.VERSION.SDK_INT >= 28) info.longVersionCode else info.versionCode.toLong(),
                 enabled = app.enabled,
-                installed = installed
+                installed = installed,
+                isSystemApp = (app.flags and ApplicationInfo.FLAG_SYSTEM) != 0
             )
         } catch (e: Exception) {
-            AppInfo(packageName, packageName, null, null, true, installed)
+            AppInfo(
+                packageName = packageName,
+                label = packageName,
+                versionName = null,
+                versionCode = null,
+                enabled = true,
+                installed = installed,
+                isSystemApp = false
+            )
         }
     }
 
     suspend fun listInstalledApps(userId: Int): List<AppInfo> {
         val pkgs = listPackageNames(userId)
-        return pkgs.map { enrich(it, true) }.sortedBy { it.label.lowercase() }
+        return pkgs.map { enrich(it, installed = true) }
+            .sortedBy { it.label.lowercase() }
     }
 
+    /**
+     * 主系统（User 0）已安装、但指定分身内尚未安装的应用（可添加列表）。
+     */
     suspend fun listAddableApps(cloneUserId: Int): List<AppInfo> {
         val clonePkgs = listPackageNames(cloneUserId)
         val user0Pkgs = listPackageNames(0)
         val addable = user0Pkgs - clonePkgs
         return addable
             .filter { !isProtectedApp(it) }
-            .map { enrich(it, false) }
+            .map { enrich(it, installed = false) }
             .sortedBy { it.label.lowercase() }
     }
 
@@ -98,11 +124,8 @@ class AppRepository(
             return OpResult.fail("卸载失败（exit=${res.exitCode}）", detail = buildDetail(cmd, res))
         }
         val now = listPackageNames(userId)
-        return if (packageName !in now) {
-            OpResult.ok("已从分身 $userId 卸载「$label」")
-        } else {
-            OpResult.fail("命令已执行，但分身 $userId 中仍存在 $packageName", detail = buildDetail(cmd, res))
-        }
+        return if (packageName !in now) OpResult.ok("已从分身 $userId 卸载「$label」")
+        else OpResult.fail("命令已执行，但分身 $userId 中仍存在 $packageName", detail = buildDetail(cmd, res))
     }
 
     suspend fun clearData(userId: Int, packageName: String): OpResult {
@@ -124,7 +147,8 @@ class AppRepository(
     suspend fun launchPackage(userId: Int, packageName: String): OpResult {
         val intent = pm.getLaunchIntentForPackage(packageName)
             ?: return OpResult.fail("未找到 $packageName 的启动 Activity")
-        val component = intent.component ?: return OpResult.fail("启动 Intent 无 Component")
+        val component = intent.component
+            ?: return OpResult.fail("启动 Intent 无 Component")
         val cmd = "am start --user $userId -n ${component.flattenToShortString()}"
         val res = shell.execute(cmd, 10_000)
         if (!res.success && res.exitCode != 0) {

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -11,16 +12,54 @@
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
         android:titleTextColor="?attr/colorOnPrimary"
-        app:title="添加应用到分身"
-        xmlns:app="http://schemas.android.com/apk/res-auto" />
+        app:title="添加应用到分身" />
 
-    <TextView
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/searchLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:textSize="13sp"
-        android:textColor="?attr/colorOnSurfaceVariant"
-        android:text="选择要安装到分身的应用（来自主系统）" />
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginTop="10dp"
+        app:boxBackgroundMode="outline"
+        app:startIconDrawable="@android:drawable/ic_menu_search"
+        android:hint="搜索应用名称或包名">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/searchInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:imeOptions="actionSearch"
+            android:maxLines="1" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="2dp">
+
+        <CheckBox
+            android:id="@+id/chkHideSystem"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="屏蔽系统应用"
+            android:checked="true" />
+
+        <TextView
+            android:id="@+id/countText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:text="0 个应用" />
+    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/addList"
