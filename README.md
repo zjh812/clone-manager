@@ -1,62 +1,54 @@
-# 多开应用管理 (Clone Manager)
+# 多开应用管理（Clone Manager）
 
-原生 Android 应用分身 / 多开管理器，通过 **Root shell** 直接管理 Android Framework 原生
-`android.os.usertype.profile.CLONE` Profile。
+针对 **Lenovo TB321FU（ZUI，已 Root）** 的原生 Android CLONE Profile 管理器。
 
-**不是**虚拟机 / 沙箱 / Parallel Space 类容器——它操作的是 Android 系统原生的多用户机制。
+直接调用 Android Framework 已有的 `android.os.usertype.profile.CLONE` 用户/Profile 机制，**不是**虚拟机 / Parallel Space / 容器类方案。
 
-## 功能
+## 设备实测命令
 
-- Root 检测（`su -c id`）
-- 读取 CLONE Profile 列表（真实 userId，不硬编码）
-- 动态读取 `mMaxAllowedPerParent`（Framework 改成 10/30 自动跟随）
-- 创建分身（`pm create-user --profileOf 0 --user-type android.os.usertype.profile.CLONE`）
-- 删除分身（先 `am stop-user -w -f` 再 `pm remove-user`，5 秒轮询确认）
-- 启动分身（`am start-user -w`）
-- 停止分身（`am stop-user -w -f`，必须加 `-f`）
-- 重命名分身（`pm rename-user`）
-- 分身应用管理：
-  - 查看分身内已安装应用
-  - 把主系统应用安装到分身（`pm install-existing --user`）
-  - 卸载分身内应用（`pm uninstall --user`，不影响主用户）
-  - 清除分身内应用数据（`pm clear --user`）
-  - 启动分身内应用（`am start --user`）
-- 调试日志页（300 条环形缓冲，复制/清空）
-- 系统兼容性检测（动态识别当前 ROM 支持的命令）
+本仓库所有命令均在 TB321FU 实机验证通过，不猜命令：
 
-## 支持设备
+| 操作 | 命令 |
+|---|---|
+| Root 检测 | `su -c id` → `uid=0(root)` |
+| 用户列表 | `cmd user list` |
+| 用户详情/类型/上限 | `dumpsys user` |
+| 启动分身 | `am start-user -w <USER_ID>` |
+| 停止分身 | `am stop-user -w -f <USER_ID>`（必须 `-f`）|
+| 创建分身 | `pm create-user --profileOf 0 --user-type android.os.usertype.profile.CLONE "<名称>"` |
+| 删除分身 | `pm remove-user <USER_ID>` |
+| 重命名分身 | `pm rename-user <USER_ID> "<新名称>"` |
+| 列分身内应用 | `pm list packages --user <USER_ID>` |
+| 安装已有应用到分身 | `pm install-existing --user <USER_ID> <PKG>` |
+| 分身内卸载 | `pm uninstall --user <USER_ID> <PKG>` |
+| 清分身应用数据 | `pm clear --user <USER_ID> <PKG>` |
+| 启动分身内应用 | `am start --user <USER_ID> -n <COMPONENT>` |
 
-实测在 **Lenovo TB321FU / ZUI / Rooted** 上工作。
+> 注意：ZUI 把 create-user/remove-user 从 `cmd user` 挪到了 `pm`，`cmd user create-user` 是 `Unknown command`。
 
-> ⚠️ 本应用依赖 Root 权限。不同 ROM / Framework 对 `cmd user` / `pm` / `am` 的命令入口和参数
-> 可能不同。App 首次运行会自动检测当前 ROM 支持哪些命令，未确认的功能不会启用。
+## 特性
+
+- 动态读取 `mMaxAllowedPerParent`（framework 改 10 / 30 自动适配，绝不硬编码）
+- 只识别 `android.os.usertype.profile.CLONE`，User 0 与非 CLONE 用户永远保护
+- 真实 userId（900/901/...），不使用列表序号代替
+- 删除/卸载/清数据均二次确认（删除需手动输入分身名称）
+- 所有 Root 操作异步、带 timeout、记录 stdout/stderr/exitCode
+- 调试日志页（环形缓冲 300 条，复制/清空）
 
 ## 技术栈
 
-- Kotlin + Coroutines + ViewModel + StateFlow
-- AndroidX + Material 3 + ViewBinding
-- 分层架构：Activity → ViewModel → Repository → RootService(su) → shell
-- Gradle 8.9 / AGP 8.5.2 / compileSdk 35 / minSdk 26
+Kotlin · Coroutines · ViewModel · StateFlow · Material 3 · ViewBinding · AGP 8.5.2 · Kotlin 2.0.20 · compileSdk 35 · minSdk 26
 
 ## 构建
 
 ```bash
-export JAVA_HOME=<JDK 17 路径>
-./gradlew :app:assembleDebug
-# 产物：app/build/outputs/apk/debug/app-debug.apk
+gradle :app:assembleDebug
 ```
 
-或直接用 Android Studio 打开项目根目录。
+APK 安装后需授予 Root 权限。
 
-## 安全设计
+## 安全声明
 
-- User 0（系统主用户）永远保护，禁止删除/停止
-- 非 CLONE 类型用户永远不显示为可管理分身
-- 删除分身需二次确认 + 手动输入分身名称
-- 清除数据 / 卸载应用需二次确认
-- 关键系统应用（SystemUI / Settings / Launcher / 本应用自身）禁止卸载
-- 所有 Root 命令有超时 / exitCode / stderr 捕获，UI 不崩溃
-
-## 许可证
-
-[MIT](LICENSE)
+- 不修改 `/system/framework`、不自动 patch services.jar；`mMaxAllowedPerParent` 由使用者自行改 framework
+- 不内置危险操作开关；V1 不提供高级模式
+- 删除分身不可恢复，应用前请备份
