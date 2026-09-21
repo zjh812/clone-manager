@@ -9,9 +9,15 @@
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
-        android:titleTextColor="?attr/colorOnPrimary" />
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_hero"
+        android:paddingTop="?attr/actionBarSize"
+        android:paddingBottom="16dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="16dp"
+        app:titleTextColor="@color/hero_text"
+        app:subtitleTextColor="#D8E4F7"
+        app:navigationIconTint="@color/hero_text" />
 
     <TextView
         android:id="@+id/cloneInfo"

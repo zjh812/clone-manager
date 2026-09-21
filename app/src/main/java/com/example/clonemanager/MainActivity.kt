@@ -1,143 +1,169 @@
 package com.example.clonemanager
 
-import android.content.Intent
+import android.graphics.Typeface
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import com.example.clonemanager.data.CapabilityInfo
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.clonemanager.data.CloneProfile
 import com.example.clonemanager.databinding.ActivityMainBinding
 import com.example.clonemanager.databinding.DialogCompatibilityBinding
-import com.example.clonemanager.ui.logs.LogsActivity
+import com.example.clonemanager.repository.CloneRepository
+import com.example.clonemanager.repository.OpResult
+import com.example.clonemanager.root.RootService
+import com.example.clonemanager.system.CommandCapability
+import com.example.clonemanager.ui.home.CloneListAdapter
+import com.example.clonemanager.ui.home.HomeUiState
+import com.example.clonemanager.ui.home.HomeViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private val viewModel: HomeViewModel by viewModels()
-    private lateinit var cloneAdapter: com.example.clonemanager.ui.home.CloneListAdapter
+
+    private val viewModel: HomeViewModel by viewModels {
+        HomeViewModel.Factory(CloneRepository(RootService()))
+    }
+
+    private val cloneAdapter = CloneListAdapter(
+        onStart = { clone -> viewModel.startClone(clone) },
+        onStop = { clone -> confirmStop(clone) },
+        onDelete = { clone -> confirmDelete(clone) },
+        onManage = { clone ->
+            startActivity(android.content.Intent(this, com.example.clonemanager.ui.clone.CloneDetailActivity::class.java).apply {
+                putExtra(com.example.clonemanager.ui.clone.CloneDetailActivity.EXTRA_USER_ID, clone.userId)
+                putExtra(com.example.clonemanager.ui.clone.CloneDetailActivity.EXTRA_CLONE_NAME, clone.name)
+            })
+        },
+        onRename = { clone -> showRenameDialog(clone) }
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setSupportActionBar(binding.toolbar)
-
-        cloneAdapter = com.example.clonemanager.ui.home.CloneListAdapter(
-            onStart = { viewModel.startClone(it) },
-            onStop = { viewModel.stopClone(it) },
-            onDelete = { askDeleteClone(it) },
-            onManage = { openDetail(it) },
-            onRename = { askRenameClone(it) }
-        )
-        binding.cloneList.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
+        binding.cloneList.layoutManager = LinearLayoutManager(this)
         binding.cloneList.adapter = cloneAdapter
 
-        binding.btnCreate.setOnClickListener { askCreateClone() }
         binding.btnRefresh.setOnClickListener { viewModel.refresh() }
         binding.btnCompatibility.setOnClickListener { showCompatibility() }
-        binding.btnLogs.setOnClickListener { startActivity(Intent(this, LogsActivity::class.java)) }
+        binding.btnCreate.setOnClickListener { showCreateDialog() }
+        binding.btnLogs.setOnClickListener {
+            startActivity(android.content.Intent(this, com.example.clonemanager.ui.debug.LogsActivity::class.java))
+        }
 
-        viewModel.uiState.observe(this) { render(it) }
-        viewModel.events.observe(this) { showOpResult(it) }
-
-        viewModel.refresh()
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect { state -> render(state) }
+            }
+        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.opEvents.collect { op -> showOpResult(op) }
+            }
+        }
     }
 
-    private fun askCreateClone() {
-        val input = android.widget.EditText(this).apply { hint = "分身名称，例如：分身7" }
+    private fun confirmStop(clone: CloneProfile) {
         MaterialAlertDialogBuilder(this)
-            .setTitle("创建分身")
-            .setView(input)
-            .setNegativeButton("取消", null)
-            .setPositiveButton("创建") { _, _ ->
+            .setTitle(R.string.stop_confirm_title)
+            .setMessage(getString(R.string.stop_confirm_message, clone.name, clone.userId))
+            .setNegativeButton(R.string.dialog_cancel, null)
+            .setPositiveButton(R.string.stop_confirm_action) { _, _ -> viewModel.stopClone(clone) }
+            .show()
+    }
+
+    private fun confirmDelete(clone: CloneProfile) {
+        val container = android.widget.LinearLayout(this).apply {
+            orientation = android.widget.LinearLayout.VERTICAL
+            setPadding(dp(20), dp(16), dp(20), 0)
+        }
+        val msg = android.widget.TextView(this).apply {
+            text = getString(R.string.delete_confirm_message, clone.name, clone.userId); textSize = 14f
+        }
+        val input = android.widget.EditText(this).apply {
+            hint = getString(R.string.delete_type_name_hint, clone.name)
+            inputType = android.text.InputType.TYPE_CLASS_TEXT; setSingleLine(true)
+        }
+        container.addView(msg); container.addView(input)
+
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.delete_confirm_title).setView(container)
+            .setNegativeButton(R.string.dialog_cancel, null)
+            .setPositiveButton(R.string.delete_confirm_action, null).create()
+
+        dialog.setOnShowListener {
+            val btn = dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)
+            btn.isEnabled = false
+            input.addTextChangedListener(object : android.text.TextWatcher {
+                override fun afterTextChanged(s: android.text.Editable?) {
+                    btn.isEnabled = s?.toString()?.trim() == clone.name
+                }
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            })
+            btn.setOnClickListener { viewModel.deleteClone(clone); dialog.dismiss() }
+        }
+        dialog.show()
+    }
+
+    private fun showCreateDialog() {
+        val input = android.widget.EditText(this).apply {
+            hint = getString(R.string.create_dialog_hint); inputType = android.text.InputType.TYPE_CLASS_TEXT
+        }
+        MaterialAlertDialogBuilder(this).setTitle(R.string.create_dialog_title).setView(input)
+            .setNegativeButton(R.string.dialog_cancel, null)
+            .setPositiveButton(R.string.create_dialog_button) { _, _ ->
                 val name = input.text.toString().trim()
                 if (name.isNotEmpty()) viewModel.createClone(name)
-            }
-            .show()
+            }.show()
     }
 
-    private fun askDeleteClone(profile: com.example.clonemanager.data.CloneProfile) {
-        if (profile.userId == 0) return
-        val edit = android.widget.EditText(this).apply { hint = "输入分身名称以确认" }
-        MaterialAlertDialogBuilder(this)
-            .setTitle("删除「${profile.name}」？")
-            .setMessage("User ID：${profile.userId}\n\n此操作会删除该分身及其全部应用数据，无法恢复。\n\n请输入分身名称以确认：")
-            .setView(edit)
-            .setNegativeButton("取消", null)
-            .setPositiveButton("删除") { _, _ ->
-                if (edit.text.toString().trim() == profile.name) viewModel.deleteClone(profile)
-                else Toast.makeText(this, "名称不匹配", Toast.LENGTH_SHORT).show()
-            }
-            .show()
-    }
-
-    private fun askRenameClone(profile: com.example.clonemanager.data.CloneProfile) {
+    private fun showRenameDialog(clone: CloneProfile) {
         val input = android.widget.EditText(this).apply {
-            setText(profile.name); setSelection(text.length)
+            setText(clone.name); setSelection(clone.name.length)
+            inputType = android.text.InputType.TYPE_CLASS_TEXT
         }
-        MaterialAlertDialogBuilder(this)
-            .setTitle("重命名分身")
-            .setView(input)
-            .setNegativeButton("取消", null)
-            .setPositiveButton("保存") { _, _ ->
+        MaterialAlertDialogBuilder(this).setTitle("重命名「${clone.name}」").setView(input)
+            .setNegativeButton(R.string.dialog_cancel, null)
+            .setPositiveButton("重命名") { _, _ ->
                 val name = input.text.toString().trim()
-                if (name.isNotEmpty()) viewModel.renameClone(profile, name)
-            }
-            .show()
+                if (name.isNotEmpty() && name != clone.name) viewModel.renameClone(clone, name)
+            }.show()
     }
 
-    private fun openDetail(profile: com.example.clonemanager.data.CloneProfile) {
-        startActivity(
-            android.content.Intent(this, com.example.clonemanager.ui.clone.CloneDetailActivity::class.java)
-                .putExtra(com.example.clonemanager.ui.clone.CloneDetailActivity.EXTRA_USER_ID, profile.userId)
-                .putExtra(com.example.clonemanager.ui.clone.CloneDetailActivity.EXTRA_CLONE_NAME, profile.name)
-        )
-    }
-
-    private fun showOpResult(op: com.example.clonemanager.repository.OpResult) {
+    private fun showOpResult(op: OpResult) {
         if (op.success) {
             Toast.makeText(this, "${getString(R.string.op_success)}：${op.message}", Toast.LENGTH_SHORT).show()
             return
         }
-        MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.op_failed)
+        MaterialAlertDialogBuilder(this).setTitle(R.string.op_failed)
             .setMessage(buildString {
                 append(op.message)
                 op.detail?.takeIf { it.isNotBlank() }?.let { append("\n\n").append(it) }
             })
-            .setPositiveButton(R.string.dialog_ok, null)
-            .show()
+            .setPositiveButton(R.string.dialog_ok, null).show()
     }
 
     private fun render(state: HomeUiState) {
         binding.progressBar.visibility = if (state.loading) View.VISIBLE else View.GONE
 
         val root = state.root
-        if (root == null) {
-            binding.rootStatusHero.text = "未知"
-            binding.rootDetail.visibility = View.GONE
-        } else if (root.available) {
-            binding.rootStatusHero.text = "已获得"
-            binding.rootDetail.visibility = View.VISIBLE
-            binding.rootDetail.text = root.output
-        } else {
-            binding.rootStatusHero.text = "未获得"
-            binding.rootDetail.visibility = View.VISIBLE
-            binding.rootDetail.text = buildString {
-                append("exitCode=").append(root.exitCode).append('\n')
-                if (root.output.isNotBlank()) append(root.output).append('\n')
-                if (root.stderr.isNotBlank()) append(root.stderr)
-            }.trim()
+        binding.rootStatusHero.text = when {
+            root == null -> "未知"
+            root.available -> "已获得"
+            else -> "未获得"
         }
 
         val limit = state.cloneLimit
@@ -162,8 +188,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun showCompatibility() {
         val state = viewModel.uiState.value
-        val caps = state.capabilities
-        if (caps == null) { viewModel.refresh(); Toast.makeText(this, R.string.cap_detecting, Toast.LENGTH_SHORT).show(); return }
+        val caps = state.capabilities ?: run { viewModel.refresh(); Toast.makeText(this, R.string.cap_detecting, Toast.LENGTH_SHORT).show(); return }
 
         val b = DialogCompatibilityBinding.inflate(layoutInflater)
         b.capSummary.text = buildString {
@@ -174,11 +199,16 @@ class MainActivity : AppCompatActivity() {
             append(getString(R.string.cap_summary_max, caps.cloneLimit?.toString() ?: "未知"))
             if (state.allUserIds.isNotEmpty()) append("\n").append(getString(R.string.cap_summary_users, state.allUserIds.joinToString(", ")))
         }
+
         val container = b.capContainer
         addCapRow(container, getString(R.string.cap_root), caps.rootAvailable, caps.rootOutput)
         addCapRow(container, getString(R.string.cap_clone_type), caps.cloneTypeSupported,
-            if (caps.cloneTypeSupported) "android.os.usertype.profile.CLONE 已存在" else "未在 dumpsys user 中发现 CLONE")
+            if (caps.cloneTypeSupported) "android.os.usertype.profile.CLONE 已存在于 dumpsys user" else "未在 dumpsys user 中发现 CLONE 类型")
         caps.capabilities.forEach { addCapabilityRow(container, it) }
+        if (caps.helpFailures.isNotEmpty()) {
+            addInfoRow(container, getString(R.string.cap_refresh_failed),
+                caps.helpFailures.entries.joinToString("\n") { "${it.key}: ${it.value}" })
+        }
 
         MaterialAlertDialogBuilder(this).setView(b.root).setCancelable(true).show()
             .also { d -> b.btnCapClose.setOnClickListener { d.dismiss() } }
@@ -186,43 +216,50 @@ class MainActivity : AppCompatActivity() {
 
     private fun addCapRow(container: LinearLayout, name: String, ok: Boolean, detail: String?) {
         addRow(container, name,
-            if (ok) "✓ 已识别" else "✗ 未识别",
-            if (ok) getColor(R.color.status_running_fg) else getColor(R.color.root_fail_fg),
+            if (ok) "✓ ${getString(R.string.cap_detected)}" else "✗ ${getString(R.string.cap_not_detected)}",
+            if (ok) resolveColor(com.google.android.material.R.attr.colorPrimary)
+            else resolveColor(com.google.android.material.R.attr.colorError),
             detail)
     }
 
-    private fun addCapabilityRow(container: LinearLayout, cap: CapabilityInfo) {
+    private fun addCapabilityRow(container: LinearLayout, cap: CommandCapability) {
         addRow(container, cap.name, cap.displayText,
-            if (cap.detected) getColor(R.color.status_running_fg) else getColor(R.color.status_stopped_fg),
+            if (cap.detected) resolveColor(com.google.android.material.R.attr.colorPrimary)
+            else resolveColor(com.google.android.material.R.attr.colorOutline),
             buildString {
-                cap.commandLine?.let { append("命令: ").append(it).append('\n') }
-                cap.note?.let { append("说明: ").append(it) }
+                cap.commandLine?.let { append(getString(R.string.cap_command)).append(": ").append(it).append('\n') }
+                cap.note?.let { append(getString(R.string.cap_note)).append(": ").append(it) }
             }.trim().ifBlank { null })
+    }
+
+    private fun addInfoRow(container: LinearLayout, name: String, detail: String) {
+        addRow(container, name, "!", resolveColor(com.google.android.material.R.attr.colorError), detail)
     }
 
     private fun addRow(container: LinearLayout, name: String, status: String, statusColor: Int, detail: String?) {
         val ctx = container.context
         val row = LinearLayout(ctx).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER_VERTICAL
+            orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL
             setPadding(0, dp(8), 0, dp(8))
         }
         row.addView(TextView(ctx).apply {
             text = name; textSize = 14f
-            setTextColor(getColor(android.R.color.black))
+            setTextColor(resolveAttr(android.R.attr.textColorPrimary))
             layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
         })
         row.addView(TextView(ctx).apply {
-            text = status; textSize = 14f; typeface = android.graphics.Typeface.DEFAULT_BOLD
-            setTextColor(statusColor)
+            text = status; textSize = 14f; typeface = Typeface.DEFAULT_BOLD; setTextColor(statusColor)
         })
         container.addView(row)
         if (!detail.isNullOrBlank()) container.addView(TextView(ctx).apply {
-            text = detail; textSize = 12f; typeface = android.graphics.Typeface.MONOSPACE
-            setTextColor(getColor(android.R.color.darker_gray))
-            setPadding(0, 0, 0, dp(4))
+            text = detail; textSize = 12f; typeface = Typeface.MONOSPACE
+            setTextColor(resolveAttr(android.R.attr.textColorSecondary)); setPadding(0, 0, 0, dp(4))
         })
     }
 
+    private fun resolveColor(attr: Int): Int {
+        val ta = obtainStyledAttributes(intArrayOf(attr)); val c = ta.getColor(0, 0xFF000000.toInt()); ta.recycle(); return c
+    }
+    private fun resolveAttr(attr: Int): Int = resolveColor(attr)
     private fun dp(v: Int): Int = (v * resources.displayMetrics.density).toInt()
 }
