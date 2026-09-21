@@ -1,139 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="?android:colorBackground">
-
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/bg_hero"
-        android:paddingTop="?attr/actionBarSize"
-        android:paddingBottom="16dp"
-        android:paddingStart="8dp"
-        android:paddingEnd="16dp"
-        app:titleTextColor="@color/hero_text"
-        app:subtitleTextColor="#D8E4F7"
-        app:navigationIconTint="@color/hero_text" />
-
-    <TextView
-        android:id="@+id/cloneInfo"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:paddingTop="12dp"
-        android:paddingBottom="4dp"
-        android:textSize="13sp"
-        android:text="User ID" />
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/searchLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginEnd="12dp"
-        android:layout_marginTop="4dp"
-        app:boxBackgroundMode="outline"
-        app:startIconDrawable="@android:drawable/ic_menu_search"
-        android:hint="搜索应用名称或包名">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/searchInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="text"
-            android:imeOptions="actionSearch"
-            android:maxLines="1" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/filterTabs"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginEnd="12dp"
-        android:layout_marginTop="6dp"
-        app:tabMode="fixed"
-        app:tabGravity="fill">
-
-        <com.google.android.material.tabs.TabItem
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="全部" />
-
-        <com.google.android.material.tabs.TabItem
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="用户应用" />
-
-        <com.google.android.material.tabs.TabItem
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="系统应用" />
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:background="?attr/rootBackground">
+    <com.google.android.material.appbar.MaterialToolbar android:id="@+id/toolbar"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:background="@android:color/transparent" android:elevation="0dp"
+        android:paddingTop="?attr/actionBarSize" android:paddingBottom="8dp" android:paddingStart="8dp" android:paddingEnd="8dp"
+        app:titleTextColor="?attr/colorOnSurface" app:subtitleTextColor="?attr/colorOnSurfaceVariant"
+        app:navigationIconTint="?attr/colorOnSurface">
+        <com.google.android.material.textfield.TextInputLayout android:id="@+id/searchLayout"
+            android:layout_width="220dp" android:layout_height="wrap_content" android:layout_gravity="center_horizontal"
+            app:boxBackgroundMode="outline" app:startIconDrawable="@drawable/ic_search"
+            app:startIconTint="?attr/colorOnSurface" android:hint="搜索">
+            <com.google.android.material.textfield.TextInputEditText android:id="@+id/searchInput"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="0dp"
+                android:background="@android:color/transparent" android:inputType="text" android:imeOptions="actionSearch"
+                android:maxLines="1" android:textColor="?attr/colorOnSurface" android:textSize="13sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <androidx.appcompat.widget.AppCompatImageButton android:id="@+id/btnRestore" android:layout_width="36dp" android:layout_height="36dp"
+            android:layout_gravity="end" android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="恢复数据" android:src="@drawable/ic_restore" android:scaleType="centerInside" app:tint="?attr/colorOnSurface" />
+        <androidx.appcompat.widget.AppCompatImageButton android:id="@+id/btnBackup" android:layout_width="36dp" android:layout_height="36dp"
+            android:layout_gravity="end" android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="备份数据" android:src="@drawable/ic_save" android:scaleType="centerInside" app:tint="?attr/colorOnSurface" />
+        <androidx.appcompat.widget.AppCompatImageButton android:id="@+id/btnAddApp" android:layout_width="36dp" android:layout_height="36dp"
+            android:layout_gravity="end" android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="添加应用" android:src="@drawable/ic_add" android:scaleType="centerInside" app:tint="?attr/colorOnSurface" />
+    </com.google.android.material.appbar.MaterialToolbar>
+    <com.google.android.material.tabs.TabLayout android:id="@+id/filterTabs" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginStart="12dp" android:layout_marginEnd="12dp" android:layout_marginTop="6dp"
+        android:background="@android:color/transparent" app:tabMode="fixed" app:tabGravity="fill">
+        <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="全部" />
+        <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="用户应用" />
+        <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="系统应用" />
     </com.google.android.material.tabs.TabLayout>
-
-    <TextView
-        android:id="@+id/appCount"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:paddingTop="6dp"
-        android:paddingBottom="2dp"
-        android:textSize="12sp"
-        android:textColor="?attr/colorOnSurfaceVariant"
-        android:text="已安装应用：0" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/appList"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:paddingStart="12dp"
-        android:paddingEnd="12dp"
-        android:clipToPadding="false" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:paddingBottom="8dp">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnBackup"
-            style="@style/Widget.Material3.Button.TonalButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:minHeight="44dp"
-            android:textSize="13sp"
-            android:text="备份数据" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnRestore"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="10dp"
-            android:minHeight="44dp"
-            android:textSize="13sp"
-            android:text="恢复数据" />
-    </LinearLayout>
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnAddApp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:text="+ 添加应用到分身" />
-
+    <TextView android:id="@+id/appCount" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:paddingStart="16dp" android:paddingEnd="16dp" android:paddingTop="6dp" android:paddingBottom="2dp"
+        android:textSize="12sp" android:textColor="?attr/colorOnSurfaceVariant" android:text="已安装应用：0" />
+    <androidx.recyclerview.widget.RecyclerView android:id="@+id/appList" android:layout_width="match_parent"
+        android:layout_height="0dp" android:layout_weight="1" android:paddingStart="12dp" android:paddingEnd="12dp" android:clipToPadding="false" />
 </LinearLayout>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:background="?attr/rootBackground">
+    <com.google.android.material.appbar.MaterialToolbar android:id="@+id/toolbar"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:background="@android:color/transparent" android:elevation="0dp"
+        android:paddingTop="?attr/actionBarSize" android:paddingBottom="12dp" android:paddingStart="8dp" android:paddingEnd="16dp"
+        app:titleTextColor="?attr/colorOnSurface" app:navigationIconTint="?attr/colorOnSurface" app:title="主题管理" />
+    <androidx.recyclerview.widget.RecyclerView android:id="@+id/themeList"
+        android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:padding="16dp" android:clipToPadding="false" />
+</LinearLayout>

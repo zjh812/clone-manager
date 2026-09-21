@@ -1,217 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="?android:colorBackground">
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@drawable/bg_hero"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp"
-        android:paddingTop="28dp"
-        android:paddingBottom="24dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/app_name"
-            android:textColor="@color/hero_text"
-            android:textSize="24sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="原生 CLONE Profile · Root 直连"
-            android:textColor="#D8E4F7"
-            android:textSize="13sp" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
-            android:orientation="horizontal">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:background="#33FFFFFF"
-                android:padding="12dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Root 权限"
-                    android:textColor="#B8C9E8"
-                    android:textSize="11sp" />
-
-                <TextView
-                    android:id="@+id/rootStatusHero"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:text="检测中…"
-                    android:textColor="@color/hero_text"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:background="?attr/rootBackground">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical"
+        android:paddingStart="20dp" android:paddingEnd="20dp" android:paddingTop="28dp" android:paddingBottom="12dp">
+        <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentStart="true"
+                android:text="@string/app_name" android:textColor="?attr/colorOnSurface" android:textSize="24sp" android:textStyle="bold" />
+            <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true"
+                android:orientation="horizontal" android:gravity="center_vertical">
+                <androidx.appcompat.widget.AppCompatImageButton android:id="@+id/btnCreate" android:layout_width="40dp" android:layout_height="40dp"
+                    android:background="?attr/selectableItemBackgroundBorderless" android:contentDescription="创建分身"
+                    android:src="@drawable/ic_add" android:scaleType="centerInside" app:tint="?attr/colorOnSurface" />
+                <androidx.appcompat.widget.AppCompatImageButton android:id="@+id/btnLogs" android:layout_width="40dp" android:layout_height="40dp"
+                    android:layout_marginStart="4dp" android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="调试日志" android:src="@drawable/ic_book" android:scaleType="centerInside" app:tint="?attr/colorOnSurface" />
+                <androidx.appcompat.widget.AppCompatImageButton android:id="@+id/btnTheme" android:layout_width="40dp" android:layout_height="40dp"
+                    android:layout_marginStart="4dp" android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="主题管理" android:src="@drawable/ic_gallery" android:scaleType="centerInside" app:tint="?attr/colorOnSurface" />
             </LinearLayout>
-
+        </RelativeLayout>
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp"
+            android:text="原生 CLONE Profile · Root 直连" android:textColor="?attr/colorOnSurfaceVariant" android:textSize="13sp" />
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="18dp" android:orientation="horizontal">
+            <LinearLayout android:layout_width="0dp" android:layout_height="88dp" android:layout_weight="1" android:orientation="vertical"
+                android:background="#33FFFFFF" android:padding="12dp">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                        android:text="Root 权限" android:textColor="?attr/colorOnSurfaceVariant" android:textSize="11sp" />
+                    <TextView android:id="@+id/btnCompatibility" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="兼容性" android:textColor="?attr/colorSecondary" android:textSize="11sp"
+                        android:paddingStart="4dp" android:paddingEnd="4dp" android:background="?attr/selectableItemBackground" />
+                </LinearLayout>
+                <TextView android:id="@+id/rootStatusHero" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp" android:text="检测中…" android:textColor="?attr/colorOnSurface"
+                    android:textSize="18sp" android:textStyle="bold" />
+            </LinearLayout>
             <Space android:layout_width="10dp" android:layout_height="1dp" />
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:background="#33FFFFFF"
-                android:padding="12dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="分身数量"
-                    android:textColor="#B8C9E8"
-                    android:textSize="11sp" />
-
-                <TextView
-                    android:id="@+id/cloneCountHero"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:text="- / -"
-                    android:textColor="@color/hero_text"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+            <LinearLayout android:layout_width="0dp" android:layout_height="88dp" android:layout_weight="1" android:orientation="vertical"
+                android:background="#33FFFFFF" android:padding="12dp">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                        android:text="分身数量" android:textColor="?attr/colorOnSurfaceVariant" android:textSize="11sp" />
+                    <TextView android:id="@+id/btnRefresh" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="↻" android:textColor="?attr/colorSecondary" android:textSize="13sp"
+                        android:paddingStart="4dp" android:paddingEnd="4dp" android:background="?attr/selectableItemBackground" />
+                </LinearLayout>
+                <TextView android:id="@+id/cloneCountHero" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp" android:text="- / -" android:textColor="?attr/colorOnSurface"
+                    android:textSize="18sp" android:textStyle="bold" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
-
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="8dp"
-        android:visibility="gone"
-        android:indeterminate="true" />
-
-    <androidx.core.widget.NestedScrollView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:fillViewport="true">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/errorCard"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                app:cardBackgroundColor="?attr/colorErrorContainer"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="0dp">
-
-                <TextView
-                    android:id="@+id/errorText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="14dp"
-                    android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-                    android:textColor="?attr/colorOnErrorContainer" />
+    <ProgressBar android:id="@+id/progressBar" android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal" android:layout_marginTop="8dp" android:indeterminateTint="@android:color/white"
+        android:visibility="gone" android:indeterminate="true" />
+    <androidx.core.widget.NestedScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:fillViewport="true">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical"
+            android:paddingStart="16dp" android:paddingEnd="16dp" android:paddingTop="8dp" android:paddingBottom="16dp">
+            <com.google.android.material.card.MaterialCardView android:id="@+id/errorCard" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:visibility="gone" app:cardBackgroundColor="#66FF0000"
+                app:cardCornerRadius="16dp" app:cardElevation="0dp">
+                <TextView android:id="@+id/errorText" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:padding="14dp" android:textAppearance="@style/TextAppearance.Material3.BodyMedium" android:textColor="?attr/colorOnSurface" />
             </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnCreate"
-                style="@style/Widget.Material3.Button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:minHeight="48dp"
-                android:drawableStart="@android:drawable/ic_input_add"
-                android:drawableTint="?attr/colorOnPrimary"
-                android:text="@string/action_create_clone" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:orientation="horizontal">
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnRefresh"
-                    style="@style/Widget.Material3.Button.TonalButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/home_refresh" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnCompatibility"
-                    style="@style/Widget.Material3.Button.TonalButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:layout_weight="1"
-                    android:text="@string/home_compatibility" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnLogs"
-                    style="@style/Widget.Material3.Button.TonalButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:layout_weight="1"
-                    android:text="调试日志" />
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/cloneListTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="10dp"
-                android:text="@string/home_clone_list_title"
-                android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
-
-            <TextView
-                android:id="@+id/cloneEmpty"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:padding="24dp"
-                android:text="@string/home_clone_empty"
-                android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-                android:textColor="?android:attr/textColorSecondary" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/cloneList"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false"
-                android:visibility="gone" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:padding="4dp"
-                android:gravity="center"
-                android:text="@string/home_phase1_hint"
-                android:textSize="12sp"
-                android:textColor="?android:attr/textColorSecondary" />
+            <TextView android:id="@+id/cloneEmpty" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:gravity="center" android:padding="24dp" android:text="@string/home_clone_empty"
+                android:textAppearance="@style/TextAppearance.Material3.BodyMedium" android:textColor="?attr/colorOnSurfaceVariant" />
+            <androidx.recyclerview.widget.RecyclerView android:id="@+id/cloneList" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:nestedScrollingEnabled="false" android:visibility="gone" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </LinearLayout>

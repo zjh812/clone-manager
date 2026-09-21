@@ -1,71 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="?android:colorBackground">
-
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/bg_hero"
-        android:paddingTop="?attr/actionBarSize"
-        android:paddingBottom="16dp"
-        android:paddingStart="8dp"
-        android:paddingEnd="16dp"
-        android:titleTextColor="@color/hero_text"
-        app:navigationIconTint="@color/hero_text"
-        app:title="调试日志"
-        xmlns:app="http://schemas.android.com/apk/res-auto" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="8dp">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnCopy"
-            style="@style/Widget.Material3.Button.TonalButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:minHeight="40dp"
-            android:textSize="13sp"
-            android:text="复制全部" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnClear"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_weight="1"
-            android:minHeight="40dp"
-            android:textSize="13sp"
-            android:text="清空日志" />
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:background="?attr/rootBackground">
+    <com.google.android.material.appbar.MaterialToolbar android:id="@+id/toolbar"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:background="@android:color/transparent" android:elevation="0dp"
+        android:paddingTop="?attr/actionBarSize" android:paddingBottom="16dp" android:paddingStart="8dp" android:paddingEnd="16dp"
+        app:titleTextColor="?attr/colorOnSurface" app:navigationIconTint="?attr/colorOnSurface" app:title="调试日志" />
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:padding="8dp">
+        <com.google.android.material.button.MaterialButton android:id="@+id/btnCopy" style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:minHeight="40dp"
+            android:textSize="13sp" android:text="复制全部" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/btnClear" style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="10dp"
+            android:layout_weight="1" android:minHeight="40dp" android:textSize="13sp" android:text="清空日志" />
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/logCount"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:paddingBottom="6dp"
-        android:textSize="12sp"
-        android:textColor="?attr/colorOnSurfaceVariant"
-        tools:text="共 0 条（最多保留 500 条）"
-        xmlns:tools="http://schemas.android.com/tools" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/logList"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:paddingStart="12dp"
-        android:paddingEnd="12dp"
-        android:clipToPadding="false" />
-
+    <TextView android:id="@+id/logCount" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:paddingStart="16dp" android:paddingEnd="16dp" android:paddingBottom="6dp"
+        android:textSize="12sp" android:textColor="?attr/colorOnSurfaceVariant" />
+    <androidx.recyclerview.widget.RecyclerView android:id="@+id/logList" android:layout_width="match_parent"
+        android:layout_height="0dp" android:layout_weight="1" android:paddingStart="12dp" android:paddingEnd="12dp" android:clipToPadding="false" />
 </LinearLayout>

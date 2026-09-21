@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="12dp"
+    android:checkable="true" android:foreground="?attr/selectableItemBackground"
+    app:cardBackgroundColor="#33FFFFFF" app:cardCornerRadius="14dp" app:cardElevation="0dp"
+    app:strokeColor="#44FFFFFF" app:strokeWidth="1dp">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal"
+        android:gravity="center_vertical" android:padding="16dp">
+        <FrameLayout android:id="@+id/themeSwatch" android:layout_width="48dp" android:layout_height="48dp" android:background="#22FFFFFF" />
+        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:layout_marginStart="14dp" android:orientation="vertical">
+            <TextView android:id="@+id/themeName" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:textSize="16sp" android:textStyle="bold" android:textColor="?attr/colorOnSurface" />
+            <TextView android:id="@+id/themeDesc" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:textSize="12sp" android:layout_marginTop="2dp" android:textColor="?attr/colorOnSurfaceVariant" />
+        </LinearLayout>
+        <TextView android:id="@+id/themeCheck" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="✓" android:textSize="20sp" android:textStyle="bold" android:textColor="?attr/colorPrimary" android:visibility="gone" />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>
