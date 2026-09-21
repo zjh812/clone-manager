@@ -7,6 +7,5 @@ data class CommandCapability(
     val note: String? = null,
     val source: String? = null
 ) {
-    val displayText: String
-        get() = if (detected) "已识别" else "未识别"
+    val displayText: String get() = if (detected) "已识别" else "未识别"
 }

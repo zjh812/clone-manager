@@ -8,6 +8,5 @@ data class DeviceCapabilities(
     val capabilities: List<CommandCapability>,
     val helpFailures: Map<String, String>
 ) {
-    fun find(name: String): CommandCapability? =
-        capabilities.firstOrNull { it.name == name }
+    fun find(name: String): CommandCapability? = capabilities.firstOrNull { it.name == name }
 }
