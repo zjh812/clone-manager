@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="ic_launcher_background">#1B3A6B</color>
-    <color name="status_running_bg">#E8F5E9</color>
-    <color name="status_running_fg">#2E7D32</color>
-    <color name="status_stopped_bg">#ECEFF1</color>
-    <color name="status_stopped_fg">#607D8B</color>
-    <color name="root_ok_bg">#E8F5E9</color>
-    <color name="root_ok_fg">#2E7D32</color>
-    <color name="root_fail_bg">#FFEBEE</color>
-    <color name="root_fail_fg">#C62828</color>
     <color name="hero_start">#1B3A6B</color>
     <color name="hero_end">#3D6DB5</color>
     <color name="hero_text">#FFFFFF</color>
