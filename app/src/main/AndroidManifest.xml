@@ -24,20 +24,10 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".ui.clone.CloneDetailActivity"
-            android:exported="false"
-            android:parentActivityName=".MainActivity" />
-
-        <activity
-            android:name=".ui.clone.AddAppsActivity"
-            android:exported="false"
-            android:parentActivityName=".ui.clone.CloneDetailActivity" />
-
-        <activity
-            android:name=".ui.debug.LogsActivity"
-            android:exported="false"
-            android:parentActivityName=".MainActivity" />
+        <activity android:name=".ui.clone.CloneDetailActivity" android:exported="false" android:parentActivityName=".MainActivity" />
+        <activity android:name=".ui.clone.AddAppsActivity" android:exported="false" android:parentActivityName=".ui.clone.CloneDetailActivity" />
+        <activity android:name=".ui.debug.LogsActivity" android:exported="false" android:parentActivityName=".MainActivity" />
+        <activity android:name=".ui.theme.ThemeActivity" android:exported="false" android:parentActivityName=".MainActivity" />
     </application>
 
 </manifest>
