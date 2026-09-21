@@ -1,11 +1,9 @@
-# Built application
-/build
-/app/build
-.gradle
-/local.properties
-/.idea
-.DS_Store
+.gradle/
+build/
+local.properties
+.idea/
 *.iml
-/captures
-.externalNativeBuild
-.cxx
+.DS_Store
+captures/
+.externalNativeBuild/
+.cxx/
