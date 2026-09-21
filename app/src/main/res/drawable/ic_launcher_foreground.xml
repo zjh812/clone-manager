@@ -1,20 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="108dp"
-    android:height="108dp"
-    android:viewportWidth="108"
-    android:viewportHeight="108">
-    <group
-        android:scaleX="0.48"
-        android:scaleY="0.48"
-        android:pivotX="54"
-        android:pivotY="54">
-        <path
-            android:fillColor="#FFFFFF"
-            android:fillAlpha="0.35"
-            android:pathData="M34,36 h30 a8,8 0 0 1 8,8 v30 a8,8 0 0 1 -8,8 h-30 a8,8 0 0 1 -8,-8 v-30 a8,8 0 0 1 8,-8 z" />
-        <path
-            android:fillColor="#FFFFFF"
-            android:pathData="M44,30 h30 a8,8 0 0 1 8,8 v30 a8,8 0 0 1 -8,8 h-30 a8,8 0 0 1 -8,-8 v-30 a8,8 0 0 1 8,-8 z" />
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
+    <group android:scaleX="0.48" android:scaleY="0.48" android:pivotX="54" android:pivotY="54">
+        <path android:fillColor="#FFFFFF" android:fillAlpha="0.35" android:pathData="M34,36 h30 a8,8 0 0 1 8,8 v30 a8,8 0 0 1 -8,8 h-30 a8,8 0 0 1 -8,-8 v-30 a8,8 0 0 1 8,-8 z" />
+        <path android:fillColor="#FFFFFF" android:pathData="M44,30 h30 a8,8 0 0 1 8,8 v30 a8,8 0 0 1 -8,8 h-30 a8,8 0 0 1 -8,-8 v-30 a8,8 0 0 1 8,-8 z" />
     </group>
 </vector>
