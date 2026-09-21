@@ -19,6 +19,7 @@ import com.example.clonemanager.data.AppInfo
 import com.example.clonemanager.databinding.ActivityCloneDetailBinding
 import com.example.clonemanager.databinding.ItemInstalledAppBinding
 import com.example.clonemanager.repository.AppRepository
+import com.example.clonemanager.repository.BackupRepository
 import com.example.clonemanager.repository.OpResult
 import com.example.clonemanager.root.RootService
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -28,11 +29,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /**
- * 分身详情页：显示指定分身内已安装的应用，支持启动/清除数据/卸载/添加。
- *
- * 支持：
- * - 搜索框（按 label / packageName 实时过滤）
- * - 顶部 Tab：全部 / 用户应用 / 系统应用
+ * 分身详情页：应用管理 + 备份/恢复。
  */
 class CloneDetailActivity : AppCompatActivity() {
 
@@ -44,6 +41,7 @@ class CloneDetailActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityCloneDetailBinding
     private lateinit var repo: AppRepository
+    private lateinit var backupRepo: BackupRepository
     private var userId: Int = 0
     private lateinit var cloneName: String
     private lateinit var adapter: InstalledAppAdapter
@@ -61,6 +59,7 @@ class CloneDetailActivity : AppCompatActivity() {
         if (userId <= 0) { finish(); return }
 
         repo = AppRepository(this, RootService())
+        backupRepo = BackupRepository(this, RootService())
 
         setSupportActionBar(binding.toolbar)
         supportActionBar?.title = cloneName
@@ -86,6 +85,9 @@ class CloneDetailActivity : AppCompatActivity() {
                 REQ_ADD_APPS
             )
         }
+
+        binding.btnBackup.setOnClickListener { confirmBackup() }
+        binding.btnRestore.setOnClickListener { showRestoreDialog() }
 
         binding.filterTabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
@@ -167,6 +169,80 @@ class CloneDetailActivity : AppCompatActivity() {
                 }
             }
             .show()
+    }
+
+    private fun confirmBackup() {
+        MaterialAlertDialogBuilder(this)
+            .setTitle("备份「$cloneName」？")
+            .setMessage(
+                "将把分身 User $userId 下所有应用的内部数据打包为 tar.gz。\n\n" +
+                    "保存位置：\n" +
+                    "/sdcard/Android/data/${packageName}/files/backups/\n\n" +
+                    "备份过程中请勿操作分身，数据量较大时可能需要数分钟。"
+            )
+            .setNegativeButton("取消", null)
+            .setPositiveButton("开始备份") { _, _ ->
+                runWithProgress("正在备份…") { backupRepo.backupClone(userId, cloneName) }
+            }
+            .show()
+    }
+
+    private fun showRestoreDialog() {
+        lifecycleScope.launch {
+            val list = withContext(Dispatchers.IO) { backupRepo.listBackups(userId) }
+            if (list.isEmpty()) {
+                MaterialAlertDialogBuilder(this@CloneDetailActivity)
+                    .setTitle("没有备份")
+                    .setMessage("分身 $cloneName 还没有任何备份文件。")
+                    .setPositiveButton("确定", null)
+                    .show()
+                return@launch
+            }
+            val items = list.map {
+                "${backupRepo.formatSize(it.sizeBytes)}  ·  " +
+                    java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault())
+                        .format(java.util.Date(it.timestamp))
+            }.toTypedArray()
+            MaterialAlertDialogBuilder(this@CloneDetailActivity)
+                .setTitle("选择要恢复的备份")
+                .setItems(items) { _, which -> confirmRestore(list[which]) }
+                .setNegativeButton("取消", null)
+                .show()
+        }
+    }
+
+    private fun confirmRestore(b: BackupRepository.BackupInfo) {
+        MaterialAlertDialogBuilder(this)
+            .setTitle("恢复备份？")
+            .setMessage(
+                "将用以下备份覆盖分身 User $userId 的全部应用数据：\n\n" +
+                    "文件：${b.fileName}\n" +
+                    "大小：${backupRepo.formatSize(b.sizeBytes)}\n\n" +
+                    "⚠ 此操作会：\n" +
+                    "1. 停止当前分身\n" +
+                    "2. 覆盖所有应用数据\n" +
+                    "3. 用备份时的数据替换现有数据\n\n" +
+                    "当前数据将丢失，无法撤销。"
+            )
+            .setNegativeButton("取消", null)
+            .setPositiveButton("确认恢复") { _, _ ->
+                runWithProgress("正在恢复…") { backupRepo.restoreBackup(userId, b) }
+            }
+            .show()
+    }
+
+    private fun runWithProgress(task: String, block: suspend () -> OpResult) {
+        val progress = android.app.ProgressDialog(this).apply {
+            setTitle("请稍候")
+            setMessage(task)
+            setCancelable(false)
+            show()
+        }
+        lifecycleScope.launch {
+            val r = withContext(Dispatchers.IO) { block() }
+            progress.dismiss()
+            showResult(r)
+        }
     }
 
     private fun showResult(r: OpResult) {
